@@ -11,19 +11,22 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
+import os  # Read environment variables.
+from datetime import timedelta  # Define JWT token lifetimes.
+from dotenv import load_dotenv  # Load values from the .env file.
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m=h!!9rwl^c!3e0nv6$e)8g7zb7mpm60w+x+()48as=(#)!rx8'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Read Django secrets and debug mode from the environment, preserving existing values as fallbacks.
+SECRET_KEY = os.getenv("SECRET_KEY")
+DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 
 ALLOWED_HOSTS = []
 
@@ -37,6 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',  # Enable Django REST Framework.
+    'rest_framework_simplejwt',  # Enable SimpleJWT integration.
+    'corsheaders',  # Enable CORS handling.
+    'patients', # Register the patient app
 ]
 
 MIDDLEWARE = [
@@ -47,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Handle CORS before other middleware.
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -73,9 +81,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+     "default": {
+        "ENGINE": "django.db.backends.postgresql",  # Use PostgreSQL.
+        "NAME": os.getenv("DB_NAME"),  # Read the database name.
+        "USER": os.getenv("DB_USER"),  # Read the database user.
+        "PASSWORD": os.getenv("DB_PASSWORD"),  # Read the database password.
+        "HOST": os.getenv("DB_HOST", "localhost"),  # Read the database host.
+        "PORT": os.getenv("DB_PORT", "5432"),  # Read the database port.
     }
 }
 
@@ -124,4 +136,28 @@ MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
+}
+
+# Use the custom patient model for authentication.
+AUTH_USER_MODEL = "patients.Patient"
+
+# Allow requests from the Vite development server.
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+
+# Configure DRF pagination, JWT authentication, and authenticated-by-default access.
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",  # Use page-number pagination.
+    "PAGE_SIZE": 5,  # Return five results per page.
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",  # Authenticate with JWT.
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",  # Require authentication by default.
+    ),
+}
+
+# Set JWT access and refresh token lifetimes.
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),  # Expire access tokens after 30 minutes.
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  # Expire refresh tokens after one day.
 }
