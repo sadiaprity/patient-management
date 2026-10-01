@@ -2,6 +2,12 @@
 
 A full-stack patient management application: a Django REST API with JWT authentication and PostgreSQL, and a React frontend for managing patients and their doctor visits.
 
+## Demo Video
+
+**[Watch the walkthrough on YouTube](https://youtu.be/wg02qSsxWNU?feature=shared)**
+
+The video shows: registration and login, the patient table with pagination, add / edit / delete, recording a visit, and the visit history.
+
 ## Features
 
 **Backend**
