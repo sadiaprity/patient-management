@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.db.models import F
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
 
 from .models import Patient, PatientVisit
@@ -25,6 +26,16 @@ class PatientDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Patient.objects.order_by("id")
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class PatientVisitListView(generics.ListAPIView):
+    serializer_class = VisitSerializer
+    pagination_class = None
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        patient = get_object_or_404(Patient, pk=self.kwargs["pk"])
+        return patient.visits.order_by("-visit_date", "-id")
 
 
 class PatientVisitCreateView(generics.CreateAPIView):
