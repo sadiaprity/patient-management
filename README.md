@@ -114,6 +114,23 @@ All seeded patients share this password. It is a **development/demo password onl
 - **Tokens in localStorage:** simple and fine for this scope, but exposed to XSS. Production would use httpOnly cookies.
 - **Visit counter and deletions:** `total_visits` is updated by the visit endpoint only. Visits created or deleted elsewhere (for example in the Django admin) do not change it.
 
+## AI Assistance
+
+I used AI tools while building this project and want to be transparent about how:
+
+| Tool | Used for |
+|---|---|
+| **Claude** | Planning the project, breaking it into steps, drafting prompts, explaining concepts |
+| **GitHub Copilot** (VS Code) | Generating first drafts of code from prompts: settings, models, serializers, views, seed script, tests, and React components and Debugging errors |
+| **Mermaid** | Generating the ER diagram (`docs/erd.png`) |
+
+**What I did myself:**
+- Set up the environment, PostgreSQL database and repository, and ran every step.
+- Reviewed generated code, fixed errors (for example the `settings.py` and URL configuration issues), and made the design decisions listed above.
+- Tested the API manually (Thunder Client) and with the automated test suite, tested the UI in the browser, and recorded the demo video.
+
+I can explain any part of the code and the reasoning behind these choices.
+
 ## Testing
 
 ```
