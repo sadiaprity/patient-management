@@ -8,7 +8,7 @@ import VisitForm from './VisitForm'
 
 const EMPTY_DATA = { count: 0, results: [], previous: null, next: null }
 
-function PatientList({ onAddPatient, onEditPatient, onRefreshReady }) {
+function PatientList({ onAddPatient, onEditPatient, onRefreshReady, currentUser }) {
   const { showToast } = useToast()
   const [page, setPage] = useState(1)
   const [data, setData] = useState(EMPTY_DATA)
@@ -159,15 +159,22 @@ function PatientList({ onAddPatient, onEditPatient, onRefreshReady }) {
                     <th scope="col">Blood group</th>
                     <th scope="col">Visits</th>
                     <th scope="col">Last visit</th>
-                    <th scope="col">Actions</th>
+                    <th className="actions-column" scope="col">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.results.map((patient) => (
-                    <tr key={patient.id}>
+                  {data.results.map((patient) => {
+                    const isCurrentUser = String(patient.id) === String(currentUser?.id)
+                    const patientName = [patient.first_name, patient.last_name]
+                      .filter(Boolean)
+                      .join(' ')
+
+                    return (
+                      <tr key={patient.id}>
                       <td>{patient.id}</td>
                       <td className="patient-name">
-                        {[patient.first_name, patient.last_name].filter(Boolean).join(' ') || '—'}
+                        {patientName || '—'}
+                        {isCurrentUser && <span className="you-badge">You</span>}
                       </td>
                       <td>{patient.mobile}</td>
                       <td>{patient.age ?? '—'}</td>
@@ -177,40 +184,65 @@ function PatientList({ onAddPatient, onEditPatient, onRefreshReady }) {
                       </td>
                       <td>{patient.total_visits ?? 0}</td>
                       <td>{patient.last_visit_date || '—'}</td>
-                      <td>
+                      <td className="actions-column">
                         <div className="patient-actions">
                           <button
                             className="action-button"
                             type="button"
+                            title="History"
+                            aria-label={`History for ${patientName || 'patient'}`}
                             onClick={() => setHistoryPatient(patient)}
                           >
-                            History
+                            <svg className="action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                              <circle cx="12" cy="12" r="8" />
+                              <path d="M12 8v4l2.5 1.5M5.5 5.5 4 7" />
+                            </svg>
                           </button>
                           <button
                             className="action-button"
                             type="button"
+                            title="Record Visit"
+                            aria-label={`Record visit for ${patientName || 'patient'}`}
                             onClick={() => setVisitPatient(patient)}
                           >
-                            Record Visit
+                            <svg className="action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                              <rect x="5" y="5" width="14" height="16" rx="2" />
+                              <path d="M9 3h6v4H9zM12 10v6M9 13h6" />
+                            </svg>
                           </button>
                           <button
                             className="action-button"
                             type="button"
+                            title="Edit"
+                            aria-label={`Edit ${patientName || 'patient'}`}
                             onClick={() => onEditPatient?.(patient)}
                           >
-                            Edit
+                            <svg className="action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                              <path d="m14 5 5 5M4 20l4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20Z" />
+                            </svg>
                           </button>
-                          <button
-                            className="action-button action-button-danger"
-                            type="button"
-                            onClick={() => handleDelete(patient)}
+                          <span
+                            className="action-tooltip"
+                            title={isCurrentUser ? "You can't delete your own account" : undefined}
                           >
-                            Delete
-                          </button>
+                            <button
+                              className="action-button action-button-danger"
+                              type="button"
+                              title={isCurrentUser ? "You can't delete your own account" : 'Delete'}
+                              aria-label={isCurrentUser ? "You can't delete your own account" : `Delete ${patientName || 'patient'}`}
+                              disabled={isCurrentUser}
+                              onClick={() => handleDelete(patient)}
+                            >
+                              <svg className="action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" />
+                              </svg>
+                            </button>
+                          </span>
                         </div>
                       </td>
-                    </tr>
-                  ))}
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

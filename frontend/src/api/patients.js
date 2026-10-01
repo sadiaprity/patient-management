@@ -7,6 +7,11 @@ export const getPatients = async (page = 1) => {
   return response.data;
 };
 
+export const getPatient = async (id) => {
+  const response = await client.get(`/patients/${id}/`);
+  return response.data;
+};
+
 export const createPatient = async (data) => {
   const response = await client.post("/patients/", data);
   return response.data;

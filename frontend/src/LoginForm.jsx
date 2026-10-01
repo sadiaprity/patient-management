@@ -1,13 +1,26 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { login } from './api/auth'
 import { useToast } from './useToast'
 
-function LoginForm({ onLogin, onBack, appName = 'Patient Management' }) {
+function LoginForm({ onLogin, onClose, onRegister, appName = 'Patient Management' }) {
   const { showToast } = useToast()
   const [mobile, setMobile] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') onClose()
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
+  const handleBackdropClick = (event) => {
+    if (event.target === event.currentTarget) onClose()
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -28,14 +41,21 @@ function LoginForm({ onLogin, onBack, appName = 'Patient Management' }) {
   }
 
   return (
-    <main className="login-page">
-      <section className="login-card" aria-labelledby="login-title">
-        {onBack && (
-          <button className="login-back" type="button" onClick={onBack}>
-            <span aria-hidden="true">←</span> Back
-          </button>
-        )}
-        <div className="brand-mark" aria-hidden="true">+</div>
+    <div className="modal-backdrop" onClick={handleBackdropClick}>
+      <section
+        className="patient-modal login-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="login-title"
+      >
+        <button
+          className="modal-close"
+          type="button"
+          aria-label="Close sign in"
+          onClick={onClose}
+        >
+          ×
+        </button>
         <p className="eyebrow">PATIENT CARE PORTAL</p>
         <h1 id="login-title">{appName}</h1>
         <p className="login-intro">Sign in to manage patient records.</p>
@@ -72,8 +92,12 @@ function LoginForm({ onLogin, onBack, appName = 'Patient Management' }) {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
+        <p className="login-register">
+          Don&apos;t have an account?{' '}
+          <button type="button" onClick={onRegister}>Create an account</button>
+        </p>
       </section>
-    </main>
+    </div>
   )
 }
 
