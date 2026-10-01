@@ -4,7 +4,7 @@ A full-stack patient management application: a Django REST API with JWT authenti
 
 ## Demo Video
 
-**[Watch the walkthrough on YouTube](https://youtu.be/wg02qSsxWNU?feature=shared)**
+**[Watch the walkthrough on YouTube](https://youtu.be/9bLsy-z66ek?feature=shared)**
 
 The video shows: registration and login, the patient table with pagination, add / edit / delete, recording a visit, and the visit history.
 
