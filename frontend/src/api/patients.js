@@ -12,6 +12,16 @@ export const createPatient = async (data) => {
   return response.data;
 };
 
+export const createVisit = async (data) => {
+  const response = await client.post("/visits/", data);
+  return response.data;
+};
+
+export const getPatientVisits = async (patientId) => {
+  const response = await client.get(`/patients/${patientId}/visits/`);
+  return response.data;
+};
+
 export const updatePatient = async (id, data) => {
   const response = await client.patch(`/patients/${id}/`, data);
   return response.data;
